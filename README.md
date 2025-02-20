@@ -6,75 +6,106 @@ A modern web application for managing dance classes, students, and instructors b
 
 - **Framework:** [Next.js 15](https://nextjs.org/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Authentication & Database:** [Firebase](https://firebase.google.com/)
+- **Authentication:** [NextAuth.js](https://next-auth.js.org/) with multiple providers
+- **Database:** [Firebase](https://firebase.google.com/)
 - **Styling:** [TailwindCSS](https://tailwindcss.com/)
-- **Environment Variables:** [Zod](https://zod.dev/) for runtime validation
+- **Form Validation:** [Zod](https://zod.dev/)
 - **Analytics:** Firebase Analytics
-- **Payment Processing:** Stripe/PayPal (Coming soon)
-- **Email Service:** SendGrid (Coming soon)
-- **SMS Notifications:** Twilio (Coming soon)
+- **Email Service:** SendGrid
+- **Charts:** Chart.js with react-chartjs-2
 
-## 🏗️ Project Structure
+## 🌟 Features
 
-```
-dance-app/
-├── src/
-│   ├── config/           # Configuration files
-│   │   ├── env.ts       # Environment variables with Zod validation
-│   │   └── firebase.ts  # Firebase initialization
-│   ├── components/      # React components
-│   ├── pages/          # Next.js pages
-│   └── styles/         # Global styles
-├── public/            # Static files
-├── scripts/          # Utility scripts
-└── .env.example     # Environment variables template
-```
+### Authentication & Authorization
+- Multi-provider authentication (Google, Facebook, Apple)
+- Role-based access control (Admin, Teacher, Student)
+- Protected routes and role-based components
+- Session management and persistence
 
-## 🔧 Environment Setup
+### Class Management
+- Class creation and scheduling
+- Student enrollment system
+- Attendance tracking
+- Progress monitoring with visual charts
+- Email notifications for class updates
 
-1. Clone the repository
+### User Management
+- User role management
+- Student progress tracking
+- Teacher performance analytics
+- Profile management
+
+### Analytics & Reporting
+- Attendance statistics
+- Class popularity metrics
+- Revenue tracking
+- Student engagement analytics
+
+### Email Notifications
+- Class enrollment confirmations
+- Attendance updates
+- Class schedule changes
+- Automated reminders
+
+## 🚀 Getting Started
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd dance-app
+   ```
+
 2. Install dependencies:
    ```bash
    npm install
    ```
-3. Copy the environment example file:
+
+3. Set up environment variables:
    ```bash
    cp .env.example .env.local
    ```
-4. Update the environment variables in `.env.local`
-5. Run the development server:
+
+4. Configure authentication providers:
+   - Set up projects in Google Cloud Console
+   - Configure Facebook Developer App
+   - Set up Apple Developer Account
+
+5. Update environment variables with your credentials
+
+6. Run the development server:
    ```bash
    npm run dev
    ```
 
-## 🔑 Environment Variables
+## 📚 Documentation
 
-The project uses different environment files for different stages:
-- `.env.local` - Development environment
-- `.env.staging` - Staging environment
-- `.env.production` - Production environment
+### Environment Variables
 
 Required environment variables include:
-- Firebase configuration
-- Database URLs
-- API keys for various services
 
-## 📝 Changelog
+- `NEXT_PUBLIC_APP_URL`: Application URL
+- `NEXT_PUBLIC_FIREBASE_*`: Firebase configuration
+- `NEXTAUTH_URL`: NextAuth.js URL
+- `NEXTAUTH_SECRET`: NextAuth.js secret
+- `SENDGRID_API_KEY`: SendGrid API key
+- `DATABASE_URL`: Database connection string
 
-### [0.1.0] - 2024-02-19
-#### Added
-- Initial project setup with Next.js and TypeScript
-- Firebase integration with environment configuration
-- Environment variable validation using Zod
-- Project structure and documentation
+### Authentication Flow
 
-## 🚀 Deployment
+1. Users can sign in using:
+   - Google account
+   - Facebook account
+   - Apple ID
 
-The application can be deployed to Vercel with environment variables configured in the Vercel dashboard.
+2. Upon first sign-in:
+   - User record is created
+   - Default role is assigned
+   - Welcome email is sent
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+3. Session management:
+   - JWT-based authentication
+   - 30-day session duration
+   - Automatic token refresh
 
 ## 🤝 Contributing
 
@@ -87,3 +118,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For support, email [hussain.marzooq.bh@icloud.com](mailto:hussain.marzooq.bh@icloud.com) or open an issue in the repository.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
