@@ -1,0 +1,66 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isTeacher() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+
+    // Classes collection
+    match /classes/{classId} {
+      // Anyone can read classes
+      allow read: if true;
+      
+      // Only admins and teachers can create/update/delete classes
+      allow create, update, delete: if isAdmin() || isTeacher();
+      
+      // Allow updates for enrollment
+      allow update: if isAuthenticated() && 
+        (request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['enrolled', 'enrolledStudents', 'lastUpdated']));
+    }
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read and write their own data
+      allow read, write: if request.auth.uid == userId;
+      
+      // Admins can read and write all user data
+      allow read, write: if isAdmin();
+    }
+
+    // Studio Rentals collection
+    match /studioRentals/{rentalId} {
+      // Anyone can read studio rentals
+      allow read: if true;
+      
+      // Authenticated users can create rentals
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+      
+      // Users can only update their own rentals
+      allow update: if isAuthenticated() &&
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
+      
+      // Only admins can delete rentals
+      allow delete: if isAdmin();
+    }
+
+    // Allow temporary write access for seeding data
+    match /classes/{classId} {
+      allow write: if true;  // WARNING: Remove this rule after seeding!
+    }
+  }
+} 

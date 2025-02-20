@@ -1,6 +1,6 @@
 # Dance Management Application
 
-A modern web application for managing dance classes, students, and instructors built with Next.js, Firebase, and TypeScript.
+A modern web application for managing dance classes, students, instructors, and studio rentals built with Next.js, Firebase, and TypeScript.
 
 ## 🚀 Tech Stack
 
@@ -13,6 +13,7 @@ A modern web application for managing dance classes, students, and instructors b
 - **Analytics:** Firebase Analytics
 - **Email Service:** SendGrid
 - **Charts:** Chart.js with react-chartjs-2
+- **AI Integration:** OpenAI GPT-3.5 for smart recommendations
 
 ## 🌟 Features
 
@@ -28,6 +29,13 @@ A modern web application for managing dance classes, students, and instructors b
 - Attendance tracking
 - Progress monitoring with visual charts
 - Email notifications for class updates
+
+### Studio Rental System
+- Calendar-based studio booking
+- Real-time availability checking
+- AI-powered booking recommendations
+- Automated conflict prevention
+- Email confirmations for bookings
 
 ### User Management
 - User role management
@@ -46,6 +54,7 @@ A modern web application for managing dance classes, students, and instructors b
 - Attendance updates
 - Class schedule changes
 - Automated reminders
+- Studio booking confirmations
 
 ## 🚀 Getting Started
 
@@ -65,14 +74,41 @@ A modern web application for managing dance classes, students, and instructors b
    cp .env.example .env.local
    ```
 
-4. Configure authentication providers:
-   - Set up projects in Google Cloud Console
-   - Configure Facebook Developer App
-   - Set up Apple Developer Account
+4. Configure required environment variables in `.env.local`:
 
-5. Update environment variables with your credentials
+   ```env
+   # Firebase Configuration
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-6. Run the development server:
+   # OpenAI Configuration (for AI recommendations)
+   OPENAI_API_KEY=your_openai_api_key
+
+   # Authentication
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your_nextauth_secret
+
+   # Email Service
+   SENDGRID_API_KEY=your_sendgrid_api_key
+   SENDGRID_FROM_EMAIL=your_verified_sender_email
+   ```
+
+5. Set up Firebase:
+   - Create a new Firebase project
+   - Enable Authentication with desired providers
+   - Set up Firestore database
+   - Add Firebase Admin SDK credentials
+
+6. Initialize the database with sample data:
+   ```bash
+   npm run seed:classes
+   ```
+
+7. Run the development server:
    ```bash
    npm run dev
    ```
@@ -85,6 +121,7 @@ Required environment variables include:
 
 - `NEXT_PUBLIC_APP_URL`: Application URL
 - `NEXT_PUBLIC_FIREBASE_*`: Firebase configuration
+- `OPENAI_API_KEY`: OpenAI API key for AI recommendations
 - `NEXTAUTH_URL`: NextAuth.js URL
 - `NEXTAUTH_SECRET`: NextAuth.js secret
 - `SENDGRID_API_KEY`: SendGrid API key
@@ -106,6 +143,20 @@ Required environment variables include:
    - JWT-based authentication
    - 30-day session duration
    - Automatic token refresh
+
+### Studio Rental System
+
+1. Booking Process:
+   - Select date and time slot
+   - Real-time availability check
+   - AI-powered recommendations
+   - Instant booking confirmation
+
+2. AI Recommendations:
+   - Based on user's booking history
+   - Considers popular time slots
+   - Suggests optimal booking times
+   - Uses OpenAI GPT-3.5
 
 ## 🤝 Contributing
 

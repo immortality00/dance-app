@@ -3,7 +3,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { Analytics, getAnalytics, isSupported } from 'firebase/analytics';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { config } from './env';
+
+// Declare app check debug token for development
+if (typeof window !== 'undefined' && config.app.isDev) {
+  // @ts-ignore
+  window.FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+}
 
 const firebaseConfig = {
   apiKey: config.firebase.apiKey,
@@ -17,6 +24,14 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+
+// Initialize App Check in non-development environments
+if (typeof window !== 'undefined') {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider(config.firebase.recaptchaSiteKey),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 
 // Initialize Firebase services
 const auth = getAuth(app);
