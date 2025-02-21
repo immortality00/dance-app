@@ -61,6 +61,11 @@
 
   p {
     @apply leading-relaxed;
+    /* Add word-break fallback for browsers that don't support text-wrap */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    /* Add text-wrap for modern browsers */
+    text-wrap: pretty;
   }
 
   a {
@@ -159,17 +164,14 @@
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
+  /* Replace scrollbar-hide with a cross-browser solution */
   .scrollbar-hide {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+    display: none; /* Chrome, Safari and Opera */
   }
 
   .text-shadow {
@@ -178,5 +180,11 @@
 
   .text-shadow-lg {
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Add overflow-wrap utility for better text wrapping */
+  .break-words {
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 }

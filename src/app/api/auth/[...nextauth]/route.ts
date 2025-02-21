@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import AppleProvider from 'next-auth/providers/apple';
@@ -6,10 +6,10 @@ import { FirestoreAdapter } from '@auth/firebase-adapter';
 import { cert } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { config } from '@/config/env';
+import { getApp, getApps, initializeApp } from 'firebase-admin/app';
+import type { UserRole } from '@/types/next-auth';
 
 // Initialize Firebase Admin if not already initialized
-import { getApp, getApps, initializeApp } from 'firebase-admin/app';
-
 const firebaseAdmin = !getApps().length
   ? initializeApp({
       credential: cert({
@@ -22,7 +22,7 @@ const firebaseAdmin = !getApps().length
 
 const db = getFirestore(firebaseAdmin);
 
-const handler = NextAuth({
+export const authOptions: AuthOptions = {
   providers: [
     GoogleProvider({
       clientId: config.auth.google.clientId,
@@ -37,7 +37,7 @@ const handler = NextAuth({
       clientSecret: config.auth.apple.clientSecret,
     }),
   ],
-  adapter: FirestoreAdapter(firebaseAdmin) as any, // Type assertion needed due to version mismatch
+  adapter: FirestoreAdapter(firebaseAdmin),
   session: {
     strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -52,31 +52,58 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, token }) {
       if (session.user) {
-        // Add user ID and role to the session
         session.user.id = token.sub!;
-        session.user.role = token.role as 'admin' | 'teacher' | 'student';
+        session.user.role = token.role as UserRole;
+        session.user.lastActive = token.lastActive;
       }
       return session;
     },
     async jwt({ token, user, account }) {
       if (user) {
-        // Add custom claims to the token
         token.uid = user.id;
-        token.role = user.role;
+        token.role = user.role || 'student'; // Default role
+        token.lastActive = user.lastActive;
       }
       return token;
     },
     async signIn({ user, account, profile }) {
-      // You can add custom logic here to validate sign-ins
-      if (!user.email) {
+      try {
+        if (!user.email) {
+          throw new Error('Email is required for authentication');
+        }
+
+        // Update or create user document in Firestore
+        const userRef = db.doc(`users/${user.id}`);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+          // Create new user with default role
+          await userRef.set({
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            role: 'student',
+            lastActive: FieldValue.serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
+          });
+        } else {
+          // Update existing user's last active timestamp
+          await userRef.update({
+            lastActive: FieldValue.serverTimestamp(),
+            ...(user.name && { name: user.name }),
+            ...(user.image && { image: user.image }),
+          });
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Error in signIn callback:', error);
         return false;
       }
-      return true;
     },
   },
   events: {
     async signIn({ user }) {
-      // Update last active timestamp in Firestore
       try {
         const userRef = db.doc(`users/${user.id}`);
         await userRef.update({
@@ -87,19 +114,30 @@ const handler = NextAuth({
       }
     },
     async createUser({ user }) {
-      // Set default role for new users
       try {
         const userRef = db.doc(`users/${user.id}`);
         await userRef.update({
-          role: 'student', // Default role
+          role: 'student',
           lastActive: FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp(),
         });
       } catch (error) {
         console.error('Error setting default user role:', error);
       }
     },
+    async linkAccount({ user }) {
+      try {
+        const userRef = db.doc(`users/${user.id}`);
+        await userRef.update({
+          lastActive: FieldValue.serverTimestamp(),
+        });
+      } catch (error) {
+        console.error('Error updating user after linking account:', error);
+      }
+    },
   },
   debug: process.env.NODE_ENV === 'development',
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST }; 

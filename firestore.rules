@@ -2,6 +2,18 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Allow read/write access to authenticated users for payments collection
+    match /payments/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow read/write access to authenticated users for expenses collection
+    match /expenses/{document=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
     // Helper functions
     function isAuthenticated() {
       return request.auth != null;

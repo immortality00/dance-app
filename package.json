@@ -8,11 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "migrate:classes": "tsx scripts/migrate-classes.ts",
-    "seed:classes": "tsx scripts/seed-classes.ts"
+    "seed:classes": "tsx scripts/seed-classes.ts",
+    "seed:financial": "tsx scripts/seed-financial-data.ts"
   },
   "dependencies": {
     "@auth/firebase-adapter": "^2.7.4",
     "@sendgrid/mail": "^8.1.4",
+    "@types/recharts": "^1.8.29",
     "chart.js": "^4.4.8",
     "dotenv": "^16.4.7",
     "firebase": "^11.3.1",
@@ -23,6 +25,7 @@
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
+    "recharts": "^2.15.1",
     "tsx": "^4.19.3",
     "zod": "^3.24.2"
   },

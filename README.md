@@ -14,6 +14,7 @@ A modern web application for managing dance classes, students, instructors, and 
 - **Email Service:** SendGrid
 - **Charts:** Chart.js with react-chartjs-2
 - **AI Integration:** OpenAI GPT-3.5 for smart recommendations
+- **Payment Processing:** [Nomod](https://nomod.com/) for secure payments
 
 ## 🌟 Features
 
@@ -25,10 +26,21 @@ A modern web application for managing dance classes, students, instructors, and 
 
 ### Class Management
 - Class creation and scheduling
-- Student enrollment system
+- Student enrollment with integrated payments
 - Attendance tracking
 - Progress monitoring with visual charts
 - Email notifications for class updates
+- Real-time availability checking
+- Automated booking confirmation
+
+### Payment Integration
+- Secure payment processing with Nomod
+- Deep linking for seamless payment flow
+- Transaction history tracking
+- Automatic enrollment after payment
+- Payment status verification
+- Failed payment handling
+- Email receipts and confirmations
 
 ### Studio Rental System
 - Calendar-based studio booking
@@ -51,6 +63,7 @@ A modern web application for managing dance classes, students, instructors, and 
 
 ### Email Notifications
 - Class enrollment confirmations
+- Payment receipts
 - Attendance updates
 - Class schedule changes
 - Automated reminders
@@ -95,6 +108,9 @@ A modern web application for managing dance classes, students, instructors, and 
    # Email Service
    SENDGRID_API_KEY=your_sendgrid_api_key
    SENDGRID_FROM_EMAIL=your_verified_sender_email
+
+   # Payment Processing
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
 
 5. Set up Firebase:
@@ -106,6 +122,7 @@ A modern web application for managing dance classes, students, instructors, and 
 6. Initialize the database with sample data:
    ```bash
    npm run seed:classes
+   npm run seed:financial
    ```
 
 7. Run the development server:
@@ -114,6 +131,30 @@ A modern web application for managing dance classes, students, instructors, and 
    ```
 
 ## 📚 Documentation
+
+### Payment Flow
+
+1. **Booking Initiation:**
+   - User selects a class and clicks "Book Now"
+   - System checks availability and enrollment status
+   - Generates Nomod payment deep link
+
+2. **Payment Processing:**
+   - User is redirected to Nomod payment interface
+   - Secure payment processing
+   - Automatic redirect back to application
+
+3. **Booking Confirmation:**
+   - System verifies payment success
+   - Updates class enrollment
+   - Sends confirmation email
+   - Records transaction in database
+
+4. **Error Handling:**
+   - Failed payments are logged
+   - User-friendly error messages
+   - Automatic booking reversal if needed
+   - Email notifications for issues
 
 ### Environment Variables
 
