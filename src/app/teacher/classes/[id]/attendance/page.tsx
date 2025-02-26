@@ -7,7 +7,12 @@ import { collection, getDocs, doc, getDoc, updateDoc, query, where, Timestamp } 
 import { useParams } from 'next/navigation';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import type { FirestoreClassData, FirestoreUserData, FirestoreAttendanceRecord } from '@/types/firebase';
-import type { AttendanceStatus } from '@/lib/email';
+import { emailQueue } from '@/utils/email-queue';
+import { logger } from '@/utils/logger';
+import { maskSensitiveData } from '@/utils/secure-config';
+import { Loading } from '@/components/Loading';
+
+type AttendanceStatus = 'present' | 'absent';
 
 interface Student {
   id: string;
@@ -169,11 +174,18 @@ function AttendanceTracking() {
             attendanceStatus
           );
         
-          await sendEmail({
+          await emailQueue.add({
             to: userData.email,
             subject: emailData.subject,
             text: emailData.text,
             html: emailData.html,
+          }).catch((error: unknown) => {
+            logger.error('Failed to queue attendance update email', maskSensitiveData({
+              error,
+              userId: studentId,
+              classId,
+              date: state.selectedDate
+            }));
           });
         }
       }

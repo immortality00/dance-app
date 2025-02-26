@@ -15,109 +15,111 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-const SAMPLE_CLASSES = [
+// Sample class data
+const sampleClasses = [
   {
-    name: 'Introduction to Ballet',
-    description: 'Perfect for beginners looking to start their ballet journey. Learn basic positions and movements.',
-    style: DanceStyle.BALLET,
-    level: 'Beginner',
-    schedule: 'Monday and Wednesday, 9:00 AM - 10:30 AM',
+    name: 'Beginner Ballet',
+    description: 'Introduction to classical ballet techniques and movements',
+    teacherId: 'instructor1',
+    schedule: '10:00 AM - 11:30 AM',
+    date: new Date('2024-03-25'),
+    duration: 90,
     capacity: 15,
-    price: 50,
-  },
-  {
-    name: 'Advanced Contemporary',
-    description: 'Advanced level contemporary dance class for experienced dancers. Explore complex choreography and expression.',
-    style: DanceStyle.CONTEMPORARY,
-    level: 'Advanced',
-    schedule: 'Tuesday and Thursday, 5:00 PM - 6:30 PM',
-    capacity: 12,
+    enrolled: 0,
+    enrolledStudents: [],
     price: 45,
+    level: 'beginner',
+    style: DanceStyle.BALLET,
+    location: 'Studio A',
   },
   {
     name: 'Hip Hop Fundamentals',
-    description: 'Learn the basics of hip hop dance, including popping, locking, and basic footwork.',
-    style: DanceStyle.HIP_HOP,
-    level: 'Beginner',
-    schedule: 'Monday and Friday, 6:00 PM - 7:00 PM',
+    description: 'Learn the basics of hip hop dance and street style',
+    teacherId: 'instructor2',
+    schedule: '2:00 PM - 3:00 PM',
+    date: new Date('2024-03-26'),
+    duration: 60,
     capacity: 20,
-    price: 40,
+    enrolled: 0,
+    enrolledStudents: [],
+    price: 35,
+    level: 'beginner',
+    style: DanceStyle.HIP_HOP,
+    location: 'Studio B',
   },
   {
-    name: 'Intermediate Jazz',
-    description: 'Build upon your jazz dance foundation with more complex combinations and techniques.',
-    style: DanceStyle.JAZZ,
-    level: 'Intermediate',
-    schedule: 'Wednesday and Friday, 4:00 PM - 5:30 PM',
-    capacity: 15,
-    price: 45,
-  },
-  {
-    name: 'Ballroom Dance',
-    description: 'Learn classic ballroom dances including waltz, foxtrot, and tango.',
-    style: DanceStyle.BALLROOM,
-    level: 'Beginner',
-    schedule: 'Saturday, 2:00 PM - 4:00 PM',
-    capacity: 24,
-    price: 55,
-  },
-  {
-    name: 'Salsa Social Dancing',
-    description: 'Master the art of salsa dancing with emphasis on social dancing skills.',
-    style: DanceStyle.SALSA,
-    level: 'Intermediate',
-    schedule: 'Friday, 7:00 PM - 8:30 PM',
-    capacity: 30,
-    price: 45,
-  },
-  {
-    name: 'Advanced Tap Workshop',
-    description: 'Advanced tap dancing techniques and complex rhythm combinations.',
-    style: DanceStyle.TAP,
-    level: 'Advanced',
-    schedule: 'Thursday, 6:00 PM - 7:30 PM',
+    name: 'Advanced Contemporary',
+    description: 'Advanced contemporary dance techniques and choreography',
+    teacherId: 'instructor3',
+    schedule: '4:00 PM - 5:30 PM',
+    date: new Date('2024-03-27'),
+    duration: 90,
     capacity: 12,
-    price: 40,
+    enrolled: 0,
+    enrolledStudents: [],
+    price: 50,
+    level: 'advanced',
+    style: DanceStyle.CONTEMPORARY,
+    location: 'Studio C',
   },
   {
-    name: 'Breakdancing Basics',
-    description: 'Introduction to breakdancing fundamentals and basic power moves.',
-    style: DanceStyle.BREAKDANCING,
-    level: 'Beginner',
-    schedule: 'Saturday, 11:00 AM - 12:30 PM',
-    capacity: 15,
-    price: 45,
+    name: 'Salsa Social Dance',
+    description: 'Learn salsa dance moves and partner work',
+    teacherId: 'instructor4',
+    schedule: '7:00 PM - 8:30 PM',
+    date: new Date('2024-03-28'),
+    duration: 90,
+    capacity: 24,
+    enrolled: 0,
+    enrolledStudents: [],
+    price: 40,
+    level: 'intermediate',
+    style: DanceStyle.SALSA,
+    location: 'Studio A',
   },
+  {
+    name: 'Jazz Dance Workshop',
+    description: 'Energetic jazz dance combinations and techniques',
+    teacherId: 'instructor5',
+    schedule: '11:00 AM - 12:00 PM',
+    date: new Date('2024-03-29'),
+    duration: 60,
+    capacity: 18,
+    enrolled: 0,
+    enrolledStudents: [],
+    price: 35,
+    level: 'intermediate',
+    style: DanceStyle.JAZZ,
+    location: 'Studio B',
+  }
 ];
 
 async function seedClasses() {
   try {
-    console.log('Starting to seed classes...');
+    console.log('Starting class seeding...');
     
-    for (const classData of SAMPLE_CLASSES) {
-      try {
-        const docRef = await addDoc(collection(db, 'classes'), {
-          ...classData,
-          enrolled: 0,
-          enrolledStudents: [],
-          teacherId: 'sample-teacher', // You can update this with actual teacher IDs
-          lastUpdated: Timestamp.now(),
-        });
-        console.log(`Added class: ${classData.name} (${docRef.id})`);
-      } catch (err) {
-        console.error(`Error adding class ${classData.name}:`, err);
-      }
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    // Add each class to Firestore
+    for (const classData of sampleClasses) {
+      const docData = {
+        ...classData,
+        date: Timestamp.fromDate(classData.date),
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        lastUpdated: Timestamp.now(),
+      };
+
+      const docRef = await addDoc(collection(db, 'classes'), docData);
+      console.log(`Added class: ${classData.name} with ID: ${docRef.id}`);
     }
 
-    console.log('\nSeeding completed!');
-    console.log(`Added ${SAMPLE_CLASSES.length} sample classes`);
-
+    console.log('Successfully seeded all classes!');
+    process.exit(0);
   } catch (error) {
-    console.error('Seeding failed:', error);
+    console.error('Error seeding classes:', error);
     process.exit(1);
   }
 }

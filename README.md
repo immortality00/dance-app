@@ -6,7 +6,7 @@ A modern web application for managing dance classes, students, instructors, and 
 
 - **Framework:** [Next.js 15](https://nextjs.org/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Authentication:** [NextAuth.js](https://next-auth.js.org/) with multiple providers
+- **Authentication:** [Firebase Authentication](https://firebase.google.com/docs/auth)
 - **Database:** [Firebase](https://firebase.google.com/)
 - **Styling:** [TailwindCSS](https://tailwindcss.com/)
 - **Form Validation:** [Zod](https://zod.dev/)
@@ -15,14 +15,21 @@ A modern web application for managing dance classes, students, instructors, and 
 - **Charts:** Chart.js with react-chartjs-2
 - **AI Integration:** OpenAI GPT-3.5 for smart recommendations
 - **Payment Processing:** [Nomod](https://nomod.com/) for secure payments
+- **Internationalization:** [next-intl](https://next-intl-docs.vercel.app/)
 
 ## 🌟 Features
 
 ### Authentication & Authorization
-- Multi-provider authentication (Google, Facebook, Apple)
+- Firebase Authentication with email/password
+- Persistent authentication state with cookies
 - Role-based access control (Admin, Teacher, Student)
-- Protected routes and role-based components
-- Session management and persistence
+- Protected routes with middleware
+- Intelligent navigation handling:
+  - Maintains user context on public pages
+  - Smart redirection after sign-out
+  - Automatic redirection for protected routes
+- Real-time user profile updates
+- Session management with secure token handling
 
 ### Class Management
 - Class creation and scheduling
@@ -171,19 +178,28 @@ Required environment variables include:
 ### Authentication Flow
 
 1. Users can sign in using:
-   - Google account
-   - Facebook account
-   - Apple ID
+   - Email and password
+   - (Coming soon: Google, Facebook, Apple ID)
 
 2. Upon first sign-in:
-   - User record is created
-   - Default role is assigned
+   - User record is created in Firebase
+   - Default role is assigned (student)
+   - Authentication token is securely stored
    - Welcome email is sent
 
 3. Session management:
-   - JWT-based authentication
-   - 30-day session duration
+   - Firebase token-based authentication
+   - 7-day token expiration
+   - Secure cookie storage
    - Automatic token refresh
+   - Cross-tab synchronization
+
+4. Sign-out behavior:
+   - Intelligent redirection based on current page
+   - Stays on public pages
+   - Redirects to homepage from protected routes
+   - Cleans up authentication state
+   - Removes secure cookies
 
 ### Studio Rental System
 

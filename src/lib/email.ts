@@ -1,146 +1,275 @@
-import { config } from '@/config/env';
+import { z } from 'zod';
 import sgMail from '@sendgrid/mail';
+import { logger } from '@/utils/logger';
+import { getPrivateConfig, maskSensitiveData } from '@/utils/secure-config';
+import { AttendanceStatus } from '@/types/firebase';
 
-sgMail.setApiKey(config.sendgrid.apiKey);
+// Get private configuration
+const config = getPrivateConfig();
 
-interface EmailOptions {
-  to: string;
-  subject: string;
-  text: string;
-  html?: string;
+// Initialize SendGrid with API key
+sgMail.setApiKey(config.SENDGRID_API_KEY);
+
+// Email validation schema
+const emailSchema = z.object({
+  to: z.string().email('Invalid email address'),
+  subject: z.string().min(1, 'Subject is required'),
+  text: z.string().min(1, 'Text content is required'),
+  html: z.string().optional(),
+});
+
+export type EmailOptions = z.infer<typeof emailSchema>;
+
+// Email error types
+export class EmailError extends Error {
+  code: string;
+  details?: Record<string, any>;
+
+  constructor(message: string, code: string, details?: Record<string, any>) {
+    super(message);
+    this.name = 'EmailError';
+    this.code = code;
+    this.details = maskSensitiveData(details || {});
+  }
 }
 
-export type AttendanceStatus = 'present' | 'absent';
+export const EMAIL_ERROR_CODES = {
+  INVALID_OPTIONS: 'email/invalid-options',
+  MISSING_RECIPIENT: 'email/missing-recipient',
+  MISSING_SUBJECT: 'email/missing-subject',
+  MISSING_CONTENT: 'email/missing-content',
+  INVALID_EMAIL: 'email/invalid-email',
+  SEND_FAILED: 'email/send-failed',
+  RATE_LIMIT_EXCEEDED: 'email/rate-limit-exceeded',
+  INVALID_TEMPLATE: 'email/invalid-template',
+  TEMPLATE_RENDER_ERROR: 'email/template-render-error',
+  CONFIG_ERROR: 'email/config-error',
+} as const;
 
-interface EmailTemplate {
+export type EmailErrorCode = typeof EMAIL_ERROR_CODES[keyof typeof EMAIL_ERROR_CODES];
+
+// Email result type
+export interface EmailResult {
+  success: boolean;
+  messageId?: string;
+  error?: {
+    code: EmailErrorCode;
+    message: string;
+    details?: Record<string, any>;
+  };
+}
+
+// Email template interface
+export interface EmailTemplate {
   subject: string;
   text: string;
   html: string;
 }
 
-interface EmailResult {
-  success: boolean;
-  error?: {
-    message: string;
-    code?: string;
-    details?: string;
-  };
+// Maximum retry attempts for sending emails
+const MAX_RETRY_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 1000; // 1 second
+
+// Helper function to delay execution
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Validate email configuration
+function validateEmailConfig() {
+  if (!config.SENDGRID_API_KEY) {
+    throw new EmailError(
+      'SendGrid API key is not configured',
+      EMAIL_ERROR_CODES.CONFIG_ERROR
+    );
+  }
+  if (!config.SENDGRID_FROM_EMAIL) {
+    throw new EmailError(
+      'Sender email is not configured',
+      EMAIL_ERROR_CODES.CONFIG_ERROR
+    );
+  }
 }
 
-function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function sanitizeHtml(html: string): string {
-  // Basic HTML sanitization
-  return html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/on\w+="[^"]*"/g, '')
-    .replace(/javascript:/gi, '');
-}
-
-export async function sendEmail({ to, subject, text, html }: EmailOptions): Promise<EmailResult> {
+// Send email with retry logic
+async function sendEmailWithRetry(
+  options: EmailOptions,
+  attempt: number = 1
+): Promise<EmailResult> {
   try {
-    // Validate email address
-    if (!validateEmail(to)) {
-      throw new Error('Invalid email address');
+    // Validate email options
+    const validatedOptions = emailSchema.parse(options);
+
+    const msg = {
+      to: validatedOptions.to,
+      from: config.SENDGRID_FROM_EMAIL,
+      subject: validatedOptions.subject,
+      text: validatedOptions.text,
+      html: validatedOptions.html || validatedOptions.text,
+    };
+
+    const response = await sgMail.send(msg);
+    const messageId = response[0]?.headers['x-message-id'];
+
+    logger.info('Email sent successfully', {
+      to: validatedOptions.to,
+      subject: validatedOptions.subject,
+      messageId,
+    });
+
+    return {
+      success: true,
+      messageId,
+    };
+  } catch (error) {
+    // Handle validation errors
+    if (error instanceof z.ZodError) {
+      logger.error('Email validation error', {
+        errors: error.errors,
+      });
+      return {
+        success: false,
+        error: {
+          code: EMAIL_ERROR_CODES.INVALID_OPTIONS,
+          message: 'Invalid email options',
+          details: { errors: error.errors },
+        },
+      };
     }
 
-    // Validate required fields
-    if (!subject || !text) {
-      throw new Error('Subject and text content are required');
-    }
+    // Handle SendGrid errors
+    if (error instanceof Error) {
+      const sgError = error as any;
+      logger.error('SendGrid error', maskSensitiveData({
+        code: sgError.code,
+        message: sgError.message,
+        response: sgError.response?.body,
+      }));
 
-    // Sanitize HTML content if provided
-    const sanitizedHtml = html ? sanitizeHtml(html) : text;
-
-    // Send email with retry logic
-    let retries = 3;
-    let lastError: any;
-
-    while (retries > 0) {
-      try {
-        await sgMail.send({
-          to,
-          from: config.sendgrid.fromEmail,
-          subject,
-          text,
-          html: sanitizedHtml,
-        });
-        return { success: true };
-      } catch (err) {
-        lastError = err;
-        retries--;
-        if (retries > 0) {
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retrying
-        }
+      // Check if we should retry
+      if (attempt < MAX_RETRY_ATTEMPTS && isRetryableError(sgError)) {
+        logger.warn(`Retrying email send (attempt ${attempt + 1}/${MAX_RETRY_ATTEMPTS})`);
+        await delay(RETRY_DELAY_MS * attempt);
+        return sendEmailWithRetry(options, attempt + 1);
       }
+
+      return {
+        success: false,
+        error: {
+          code: getErrorCode(sgError),
+          message: sgError.message,
+          details: maskSensitiveData({
+            response: sgError.response?.body,
+            attempt,
+          }),
+        },
+      };
     }
 
-    // If all retries failed, throw the last error
-    throw lastError;
-  } catch (error: any) {
-    console.error('Error sending email:', error);
+    // Handle unknown errors
+    logger.error('Unknown email error', maskSensitiveData({ error }));
     return {
       success: false,
       error: {
+        code: EMAIL_ERROR_CODES.SEND_FAILED,
         message: 'Failed to send email',
-        code: error.code,
-        details: error.message,
+        details: maskSensitiveData({ error }),
       },
     };
   }
 }
 
+// Helper function to determine if an error is retryable
+function isRetryableError(error: any): boolean {
+  // Rate limit errors
+  if (error.code === 429) return true;
+  
+  // Server errors
+  if (error.code >= 500) return true;
+  
+  // Network errors
+  if (error.code === 'ECONNRESET' || error.code === 'ETIMEDOUT') return true;
+  
+  return false;
+}
+
+// Helper function to map SendGrid errors to our error codes
+function getErrorCode(error: any): EmailErrorCode {
+  if (error.code === 429) return EMAIL_ERROR_CODES.RATE_LIMIT_EXCEEDED;
+  if (error.code === 'INVALID_TEMPLATE') return EMAIL_ERROR_CODES.INVALID_TEMPLATE;
+  return EMAIL_ERROR_CODES.SEND_FAILED;
+}
+
+// Email templates
 export const emailTemplates = {
   classEnrollment(className: string): EmailTemplate {
-    const subject = `Welcome to ${className}!`;
-    const text = `You have successfully enrolled in ${className}. We look forward to seeing you in class!`;
-    const html = `
-      <h1>Welcome to ${className}!</h1>
-      <p>You have successfully enrolled in ${className}. We look forward to seeing you in class!</p>
-      <p>Please make sure to arrive 10 minutes before the class starts.</p>
-    `;
-
-    return { subject, text, html };
+    return {
+      subject: `Enrolled in ${className}`,
+      text: `You have successfully enrolled in ${className}. We look forward to seeing you in class!`,
+      html: `
+        <h2>Class Enrollment Confirmation</h2>
+        <p>You have successfully enrolled in <strong>${className}</strong>.</p>
+        <p>We look forward to seeing you in class!</p>
+      `,
+    };
   },
 
   classReminder(className: string, date: string, time: string): EmailTemplate {
-    const subject = `Reminder: ${className} Tomorrow`;
-    const text = `This is a reminder that your ${className} class is scheduled for tomorrow, ${date} at ${time}.`;
-    const html = `
-      <h1>Class Reminder</h1>
-      <p>This is a reminder that your <strong>${className}</strong> class is scheduled for tomorrow.</p>
-      <p>Date: ${date}</p>
-      <p>Time: ${time}</p>
-      <p>Please arrive 10 minutes before the class starts.</p>
-    `;
+    return {
+      subject: `Reminder: ${className} class tomorrow`,
+      text: `This is a reminder that your ${className} class is scheduled for ${date} at ${time}.`,
+      html: `
+        <h2>Class Reminder</h2>
+        <p>This is a reminder that your <strong>${className}</strong> class is scheduled for:</p>
+        <p>Date: ${date}<br>Time: ${time}</p>
+      `,
+    };
+  },
 
-    return { subject, text, html };
+  paymentConfirmation(className: string, amount: number): EmailTemplate {
+    return {
+      subject: `Payment Confirmation - ${className}`,
+      text: `Your payment of $${amount} for ${className} has been processed successfully.`,
+      html: `
+        <h2>Payment Confirmation</h2>
+        <p>Your payment has been processed successfully:</p>
+        <p>Class: ${className}<br>Amount: $${amount}</p>
+      `,
+    };
   },
 
   attendanceUpdate(className: string, date: string, status: AttendanceStatus): EmailTemplate {
-    const subject = `Attendance Record: ${className}`;
-    const text = `Your attendance for ${className} on ${date} has been marked as ${status}.`;
-    const html = `
-      <h1>Attendance Record</h1>
-      <p>Your attendance for <strong>${className}</strong> on ${date} has been marked as <strong>${status}</strong>.</p>
-      ${status === 'absent' ? '<p>If you believe this is incorrect, please contact your instructor.</p>' : ''}
-    `;
-
-    return { subject, text, html };
+    const statusText = status === 'present' ? 'present at' : 'absent from';
+    return {
+      subject: `Attendance Update - ${className}`,
+      text: `This is to confirm that you were marked as ${statusText} ${className} on ${date}.`,
+      html: `
+        <h2>Attendance Update</h2>
+        <p>This is to confirm that you were marked as <strong>${statusText}</strong>:</p>
+        <p>Class: ${className}<br>Date: ${date}</p>
+      `,
+    };
   },
+};
 
-  classUpdate(className: string, updateType: string, details: string): EmailTemplate {
-    const subject = `Class Update: ${className}`;
-    const text = `Important update regarding your ${className} class: ${updateType}. ${details}`;
-    const html = `
-      <h1>Class Update: ${className}</h1>
-      <h2>${updateType}</h2>
-      <p>${details}</p>
-    `;
-
-    return { subject, text, html };
-  },
-}; 
+// Main email sending function
+export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
+  try {
+    validateEmailConfig();
+    return await sendEmailWithRetry(options);
+  } catch (error) {
+    if (error instanceof EmailError) {
+      logger.error('Email configuration error', {
+        code: error.code,
+        message: error.message,
+      });
+      return {
+        success: false,
+        error: {
+          code: error.code as EmailErrorCode,
+          message: error.message,
+          details: error.details,
+        },
+      };
+    }
+    throw error;
+  }
+} 
