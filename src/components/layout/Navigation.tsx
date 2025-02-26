@@ -47,7 +47,7 @@ export default function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-indigo-600">
+              <Link href="/" className="text-xl font-bold text-indigo-600">
                 Dance App
               </Link>
             </div>

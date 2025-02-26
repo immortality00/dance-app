@@ -12,25 +12,45 @@ const envSchema = z.object({
   NEXT_PUBLIC_FIREBASE_API_KEY: z.string().min(1, 'Firebase API Key is required'),
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().min(1, 'Firebase Auth Domain is required'),
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().min(1, 'Firebase Project ID is required'),
-  FIREBASE_ADMIN_PRIVATE_KEY: z.string().min(1, 'Firebase Admin Private Key is required'),
-  FIREBASE_ADMIN_CLIENT_EMAIL: z.string().email('Firebase Admin Client Email must be a valid email'),
+  FIREBASE_ADMIN_PRIVATE_KEY: process.env.NODE_ENV === 'production' 
+    ? z.string().min(1, 'Firebase Admin Private Key is required')
+    : z.string().optional(),
+  FIREBASE_ADMIN_CLIENT_EMAIL: process.env.NODE_ENV === 'production'
+    ? z.string().email('Firebase Admin Client Email must be a valid email')
+    : z.string().optional(),
 
   // Firebase (Optional)
   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
 
-  // Authentication Providers (Required for auth)
-  NEXTAUTH_URL: z.string().url('NextAuth URL must be a valid URL'),
-  NEXTAUTH_SECRET: z.string().min(32, 'NextAuth Secret must be at least 32 characters long'),
+  // Authentication Providers (Optional in development)
+  NEXTAUTH_URL: process.env.NODE_ENV === 'production'
+    ? z.string().url('NextAuth URL must be a valid URL')
+    : z.string().optional(),
+  NEXTAUTH_SECRET: process.env.NODE_ENV === 'production'
+    ? z.string().min(32, 'NextAuth Secret must be at least 32 characters long')
+    : z.string().optional(),
 
-  // OAuth Providers (Required if using respective providers)
-  GOOGLE_CLIENT_ID: z.string().min(1, 'Google Client ID is required when using Google auth'),
-  GOOGLE_CLIENT_SECRET: z.string().min(1, 'Google Client Secret is required when using Google auth'),
-  FACEBOOK_CLIENT_ID: z.string().min(1, 'Facebook Client ID is required when using Facebook auth'),
-  FACEBOOK_CLIENT_SECRET: z.string().min(1, 'Facebook Client Secret is required when using Facebook auth'),
-  APPLE_CLIENT_ID: z.string().min(1, 'Apple Client ID is required when using Apple auth'),
-  APPLE_CLIENT_SECRET: z.string().min(1, 'Apple Client Secret is required when using Apple auth'),
+  // OAuth Providers (Optional in development)
+  GOOGLE_CLIENT_ID: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'Google Client ID is required when using Google auth')
+    : z.string().optional(),
+  GOOGLE_CLIENT_SECRET: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'Google Client Secret is required when using Google auth')
+    : z.string().optional(),
+  FACEBOOK_CLIENT_ID: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'Facebook Client ID is required when using Facebook auth')
+    : z.string().optional(),
+  FACEBOOK_CLIENT_SECRET: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'Facebook Client Secret is required when using Facebook auth')
+    : z.string().optional(),
+  APPLE_CLIENT_ID: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'Apple Client ID is required when using Apple auth')
+    : z.string().optional(),
+  APPLE_CLIENT_SECRET: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'Apple Client Secret is required when using Apple auth')
+    : z.string().optional(),
 
   // Payment Processing (Optional until payment features are used)
   STRIPE_SECRET_KEY: z.string().startsWith('sk_').optional(),
@@ -42,9 +62,13 @@ const envSchema = z.object({
   PAYPAL_CLIENT_SECRET: z.string().optional(),
   PAYPAL_WEBHOOK_ID: z.string().optional(),
 
-  // Communications (Required for email features)
-  SENDGRID_API_KEY: z.string().startsWith('SG.', 'SendGrid API Key must start with "SG."'),
-  SENDGRID_FROM_EMAIL: z.string().email('SendGrid From Email must be a valid email'),
+  // Communications (Optional in development)
+  SENDGRID_API_KEY: process.env.NODE_ENV === 'production'
+    ? z.string().startsWith('SG.', 'SendGrid API Key must start with "SG."')
+    : z.string().optional(),
+  SENDGRID_FROM_EMAIL: process.env.NODE_ENV === 'production'
+    ? z.string().email('SendGrid From Email must be a valid email')
+    : z.string().optional(),
 
   // Communications (Optional)
   TWILIO_ACCOUNT_SID: z.string().optional(),
@@ -72,14 +96,67 @@ const envSchema = z.object({
   // Redis (Optional)
   REDIS_URL: z.string().url().optional(),
 
-  // Firebase App Check (Required for production)
-  NEXT_PUBLIC_RECAPTCHA_SITE_KEY: z.string().min(1, 'reCAPTCHA Site Key is required for production'),
+  // reCAPTCHA (Optional in development)
+  NEXT_PUBLIC_RECAPTCHA_SITE_KEY: process.env.NODE_ENV === 'production'
+    ? z.string().min(1, 'reCAPTCHA Site Key is required for production')
+    : z.string().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
 
 function validateEnv(): Env {
   try {
+    // Check if we're on the client side
+    if (typeof window !== 'undefined') {
+      // Create a minimal env object for client-side
+      return {
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        NODE_ENV: (process.env.NODE_ENV || 'development') as NodeEnv,
+        NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+        NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+        NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+        NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+        NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
+        NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || '',
+        // Add empty strings for required server-side variables
+        JWT_SECRET: '',
+        ENCRYPTION_KEY: '',
+        DATABASE_URL: '',
+        // Add other required fields with empty defaults
+        FIREBASE_ADMIN_PRIVATE_KEY: '',
+        FIREBASE_ADMIN_CLIENT_EMAIL: '',
+        NEXTAUTH_URL: '',
+        NEXTAUTH_SECRET: '',
+        GOOGLE_CLIENT_ID: '',
+        GOOGLE_CLIENT_SECRET: '',
+        FACEBOOK_CLIENT_ID: '',
+        FACEBOOK_CLIENT_SECRET: '',
+        APPLE_CLIENT_ID: '',
+        APPLE_CLIENT_SECRET: '',
+        STRIPE_SECRET_KEY: '',
+        STRIPE_PUBLISHABLE_KEY: '',
+        STRIPE_WEBHOOK_SECRET: '',
+        PAYPAL_CLIENT_ID: '',
+        PAYPAL_CLIENT_SECRET: '',
+        PAYPAL_WEBHOOK_ID: '',
+        SENDGRID_API_KEY: '',
+        SENDGRID_FROM_EMAIL: '',
+        TWILIO_ACCOUNT_SID: '',
+        TWILIO_AUTH_TOKEN: '',
+        TWILIO_PHONE_NUMBER: '',
+        OPENAI_API_KEY: '',
+        OPENAI_ORGANIZATION_ID: '',
+        BIGQUERY_PROJECT_ID: '',
+        BIGQUERY_DATASET_ID: '',
+        BIGQUERY_PRIVATE_KEY: '',
+        BIGQUERY_CLIENT_EMAIL: '',
+        REDIS_URL: '',
+        NEXT_PUBLIC_RECAPTCHA_SITE_KEY: '',
+      } as Env;
+    }
+
+    // On server side, validate all variables
     return envSchema.parse(process.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -98,7 +175,7 @@ const env = validateEnv();
 export const config = {
   app: {
     url: env.NEXT_PUBLIC_APP_URL,
-    nodeEnv: env.NODE_ENV,
+    nodeEnv: env.NODE_ENV as NodeEnv,
     isDev: env.NODE_ENV === 'development',
     isStaging: env.NODE_ENV === 'staging',
     isProd: env.NODE_ENV === 'production',
@@ -165,11 +242,11 @@ export const config = {
     },
   },
   security: {
-    jwtSecret: env.JWT_SECRET,
-    encryptionKey: env.ENCRYPTION_KEY,
+    jwtSecret: typeof window === 'undefined' ? env.JWT_SECRET : undefined,
+    encryptionKey: typeof window === 'undefined' ? env.ENCRYPTION_KEY : undefined,
   },
   database: {
-    url: env.DATABASE_URL,
+    url: typeof window === 'undefined' ? env.DATABASE_URL : undefined,
   },
   redis: {
     url: env.REDIS_URL,

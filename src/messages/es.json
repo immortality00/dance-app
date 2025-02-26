@@ -1,0 +1,160 @@
+{
+  "Profile": {
+    "sections": {
+      "personalInfo": "Información Personal",
+      "upcomingClasses": "Próximas Clases",
+      "attendance": "Historial de Asistencia"
+    },
+    "fields": {
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "phone": "Número de Teléfono",
+      "language": "Idioma Preferido",
+      "notifications": "Notificaciones"
+    },
+    "languages": {
+      "english": "Inglés",
+      "spanish": "Español",
+      "french": "Francés"
+    },
+    "notifications": {
+      "email": "Notificaciones por correo",
+      "sms": "Notificaciones por SMS"
+    },
+    "buttons": {
+      "saveChanges": "Guardar Cambios",
+      "saving": "Guardando..."
+    },
+    "messages": {
+      "noUpcomingClasses": "No hay clases próximas",
+      "noAttendanceRecords": "No hay registros de asistencia"
+    },
+    "attendance": {
+      "present": "Presente",
+      "absent": "Ausente"
+    },
+    "errors": {
+      "fetchProfile": "Error al cargar el perfil",
+      "fetchClasses": "Error al cargar las clases próximas",
+      "fetchAttendance": "Error al cargar el historial de asistencia",
+      "updateProfile": "Error al actualizar el perfil"
+    },
+    "success": {
+      "profileUpdate": "Perfil actualizado exitosamente"
+    }
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Iniciar sesión",
+      "subtitle": "Ingresa tus credenciales para acceder a tu cuenta"
+    },
+    "signUp": {
+      "title": "Crear una nueva cuenta",
+      "subtitle": "Únete a nosotros y comienza tu viaje en la danza"
+    },
+    "fields": {
+      "name": "Nombre completo",
+      "email": "Correo electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña"
+    },
+    "buttons": {
+      "signIn": "Iniciar sesión",
+      "signUp": "Registrarse",
+      "resetPassword": "Enviar enlace"
+    },
+    "links": {
+      "signIn": "¿Ya tienes una cuenta? Inicia sesión",
+      "signUp": "¿No tienes una cuenta? Regístrate",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "backToSignIn": "Volver a iniciar sesión"
+    },
+    "errors": {
+      "signIn": "Error al iniciar sesión. Por favor, verifica tus credenciales.",
+      "signUp": "Error al crear la cuenta. Por favor, inténtalo de nuevo.",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "resetPassword": "Error al enviar el correo de restablecimiento. Por favor, inténtalo de nuevo."
+    },
+    "success": {
+      "signUp": "¡Cuenta creada exitosamente!",
+      "resetEmailSent": "¡Correo de restablecimiento enviado exitosamente!"
+    },
+    "forgotPassword": {
+      "title": "Restablecer tu contraseña",
+      "subtitle": "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña",
+      "emailSentMessage": "Revisa tu correo electrónico para encontrar el enlace de restablecimiento"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "error": "Se produjo un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "submit": "Enviar"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signOut": "Cerrar Sesión",
+    "signUp": "Registrarse",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu Contraseña?"
+  },
+  "classes": {
+    "title": "Clases",
+    "enroll": "Inscribirse",
+    "schedule": "Horario",
+    "instructor": "Instructor",
+    "capacity": "Capacidad",
+    "price": "Precio",
+    "level": "Nivel",
+    "style": "Estilo"
+  },
+  "attendance": {
+    "title": "Asistencia",
+    "present": "Presente",
+    "absent": "Ausente",
+    "date": "Fecha",
+    "status": "Estado"
+  },
+  "payments": {
+    "title": "Pagos",
+    "amount": "Monto",
+    "status": "Estado",
+    "date": "Fecha",
+    "method": "Método de Pago"
+  },
+  "Classes": {
+    "title": "Clases Disponibles",
+    "fields": {
+      "instructor": "Instructor",
+      "date": "Fecha",
+      "time": "Hora",
+      "duration": "Duración",
+      "minutes": "minutos",
+      "level": "Nivel",
+      "style": "Estilo",
+      "availability": "Disponibilidad",
+      "price": "Precio"
+    },
+    "buttons": {
+      "book": "Reservar Clase",
+      "classFull": "Clase Llena",
+      "tryAgain": "Intentar de Nuevo"
+    },
+    "messages": {
+      "noClasses": "No hay clases disponibles en este momento",
+      "bookingInProgress": "Procesando tu reserva..."
+    },
+    "errors": {
+      "fetchClasses": "Error al cargar las clases. Por favor, intenta de nuevo.",
+      "notLoggedIn": "Por favor, inicia sesión para reservar una clase",
+      "classFull": "Esta clase ya está llena",
+      "alreadyEnrolled": "Ya estás inscrito en esta clase",
+      "bookingFailed": "Error al reservar la clase. Por favor, intenta de nuevo."
+    }
+  }
+} 

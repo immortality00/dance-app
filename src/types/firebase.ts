@@ -11,18 +11,39 @@ export enum DanceStyle {
   BREAKDANCING = 'Breakdancing'
 }
 
+export interface FirestoreUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: 'student' | 'teacher' | 'admin';
+  language: string;
+  notifications: {
+    email: boolean;
+    sms: boolean;
+  };
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface FirestoreClassData {
   id: string;
   name: string;
   description: string;
+  teacherId: string;
   schedule: string;
+  date: Timestamp;
+  duration: number; // in minutes
   capacity: number;
   enrolled: number;
-  teacherId: string;
-  enrolledStudents: string[];
-  style: DanceStyle;
+  enrolledStudents: string[]; // array of user IDs
+  waitlist: string[]; // array of user IDs
   price: number;
-  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  level: 'beginner' | 'intermediate' | 'advanced';
+  style: string;
+  location: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
   lastUpdated: Timestamp;
 }
 
@@ -34,8 +55,18 @@ export interface FirestoreUserData {
   lastActive: Timestamp;
 }
 
+export type AttendanceStatus = 'present' | 'absent';
+
 export interface FirestoreAttendanceRecord {
-  date: string;
+  id: string;
+  classId: string;
+  className: string;
+  studentId: string;
+  date: Timestamp;
+  status: 'present' | 'absent';
+  notes?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
   presentStudents: string[];
   lastUpdated: Timestamp;
 }

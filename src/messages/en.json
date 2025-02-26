@@ -1,0 +1,169 @@
+{
+  "Profile": {
+    "sections": {
+      "personalInfo": "Personal Information",
+      "upcomingClasses": "Upcoming Classes",
+      "attendance": "Attendance History"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "language": "Preferred Language",
+      "notifications": "Notifications"
+    },
+    "languages": {
+      "english": "English",
+      "spanish": "Spanish",
+      "french": "French"
+    },
+    "notifications": {
+      "email": "Email notifications",
+      "sms": "SMS notifications"
+    },
+    "buttons": {
+      "saveChanges": "Save Changes",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "noUpcomingClasses": "No upcoming classes",
+      "noAttendanceRecords": "No attendance records"
+    },
+    "attendance": {
+      "present": "Present",
+      "absent": "Absent"
+    },
+    "errors": {
+      "fetchProfile": "Failed to fetch profile",
+      "fetchClasses": "Failed to fetch upcoming classes",
+      "fetchAttendance": "Failed to fetch attendance history",
+      "updateProfile": "Failed to update profile"
+    },
+    "success": {
+      "profileUpdate": "Profile updated successfully"
+    }
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Sign in to your account",
+      "subtitle": "Enter your credentials to access your account"
+    },
+    "signUp": {
+      "title": "Create a new account",
+      "subtitle": "Join us and start your dance journey"
+    },
+    "fields": {
+      "name": "Full Name",
+      "email": "Email address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "buttons": {
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "resetPassword": "Send reset link"
+    },
+    "links": {
+      "signIn": "Already have an account? Sign in",
+      "signUp": "Don't have an account? Sign up",
+      "forgotPassword": "Forgot your password?",
+      "backToSignIn": "Back to sign in"
+    },
+    "errors": {
+      "signIn": "Failed to sign in. Please check your credentials.",
+      "signUp": "Failed to create account. Please try again.",
+      "passwordMismatch": "Passwords do not match",
+      "emailExists": "An account already exists with this email. Please sign in instead.",
+      "invalidEmail": "Please enter a valid email address",
+      "weakPassword": "Password should be at least 6 characters long",
+      "networkError": "Network connection error. Please check your internet connection and try again.",
+      "resetPassword": "Failed to send reset email. Please try again.",
+      "userNotFound": "No account found with this email",
+      "invalidCredentials": "Invalid email or password",
+      "accountExists": "An account already exists with this email using a different provider",
+      "databaseError": "Failed to process sign in. Please try again later",
+      "providerError": "Error occurred with the authentication provider"
+    },
+    "success": {
+      "signUp": "Account created successfully!",
+      "resetEmailSent": "Password reset email sent successfully!"
+    },
+    "forgotPassword": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "emailSentMessage": "Check your email for a link to reset your password"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "signUp": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?"
+  },
+  "classes": {
+    "title": "Classes",
+    "enroll": "Enroll",
+    "schedule": "Schedule",
+    "instructor": "Instructor",
+    "capacity": "Capacity",
+    "price": "Price",
+    "level": "Level",
+    "style": "Style"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "present": "Present",
+    "absent": "Absent",
+    "date": "Date",
+    "status": "Status"
+  },
+  "payments": {
+    "title": "Payments",
+    "amount": "Amount",
+    "status": "Status",
+    "date": "Date",
+    "method": "Payment Method"
+  },
+  "Classes": {
+    "title": "Available Classes",
+    "fields": {
+      "instructor": "Instructor",
+      "date": "Date",
+      "time": "Time",
+      "duration": "Duration",
+      "minutes": "minutes",
+      "level": "Level",
+      "style": "Style",
+      "availability": "Availability",
+      "price": "Price"
+    },
+    "buttons": {
+      "book": "Book Class",
+      "classFull": "Class Full",
+      "tryAgain": "Try Again"
+    },
+    "messages": {
+      "noClasses": "No classes available at the moment",
+      "bookingInProgress": "Processing your booking..."
+    },
+    "errors": {
+      "fetchClasses": "Failed to load classes. Please try again.",
+      "notLoggedIn": "Please sign in to book a class",
+      "classFull": "This class is already full",
+      "alreadyEnrolled": "You are already enrolled in this class",
+      "bookingFailed": "Failed to book the class. Please try again."
+    }
+  }
+} 

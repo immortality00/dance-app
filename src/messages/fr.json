@@ -1,0 +1,88 @@
+{
+  "Profile": {
+    "sections": {
+      "personalInfo": "Informations Personnelles",
+      "upcomingClasses": "Cours à Venir",
+      "attendance": "Historique de Présence"
+    },
+    "fields": {
+      "name": "Nom",
+      "email": "Email",
+      "phone": "Numéro de Téléphone",
+      "language": "Langue Préférée",
+      "notifications": "Notifications"
+    },
+    "languages": {
+      "english": "Anglais",
+      "spanish": "Espagnol",
+      "french": "Français"
+    },
+    "notifications": {
+      "email": "Notifications par email",
+      "sms": "Notifications par SMS"
+    },
+    "buttons": {
+      "saveChanges": "Enregistrer",
+      "saving": "Enregistrement..."
+    },
+    "messages": {
+      "noUpcomingClasses": "Aucun cours à venir",
+      "noAttendanceRecords": "Aucun historique de présence"
+    },
+    "attendance": {
+      "present": "Présent",
+      "absent": "Absent"
+    },
+    "errors": {
+      "fetchProfile": "Échec du chargement du profil",
+      "fetchClasses": "Échec du chargement des cours à venir",
+      "fetchAttendance": "Échec du chargement de l'historique de présence",
+      "updateProfile": "Échec de la mise à jour du profil"
+    },
+    "success": {
+      "profileUpdate": "Profil mis à jour avec succès"
+    }
+  },
+  "Auth": {
+    "signIn": {
+      "title": "Connexion à votre compte",
+      "subtitle": "Entrez vos identifiants pour accéder à votre compte"
+    },
+    "signUp": {
+      "title": "Créer un nouveau compte",
+      "subtitle": "Rejoignez-nous et commencez votre voyage dans la danse"
+    },
+    "fields": {
+      "name": "Nom complet",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe"
+    },
+    "buttons": {
+      "signIn": "Se connecter",
+      "signUp": "S'inscrire",
+      "resetPassword": "Envoyer le lien"
+    },
+    "links": {
+      "signIn": "Vous avez déjà un compte ? Connectez-vous",
+      "signUp": "Vous n'avez pas de compte ? Inscrivez-vous",
+      "forgotPassword": "Mot de passe oublié ?",
+      "backToSignIn": "Retour à la connexion"
+    },
+    "errors": {
+      "signIn": "Échec de la connexion. Veuillez vérifier vos identifiants.",
+      "signUp": "Échec de la création du compte. Veuillez réessayer.",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "resetPassword": "Échec de l'envoi de l'e-mail de réinitialisation. Veuillez réessayer."
+    },
+    "success": {
+      "signUp": "Compte créé avec succès !",
+      "resetEmailSent": "E-mail de réinitialisation envoyé avec succès !"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser votre mot de passe",
+      "subtitle": "Entrez votre adresse e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe",
+      "emailSentMessage": "Vérifiez votre e-mail pour le lien de réinitialisation"
+    }
+  }
+} 

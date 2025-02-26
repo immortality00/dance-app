@@ -38,153 +38,186 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-@layer base {
-  body {
-    @apply bg-gray-50 text-gray-900 antialiased;
-  }
-
-  h1 {
-    @apply text-4xl font-bold tracking-tight;
-  }
-
-  h2 {
-    @apply text-3xl font-semibold tracking-tight;
-  }
-
-  h3 {
-    @apply text-2xl font-semibold;
-  }
-
-  h4 {
-    @apply text-xl font-medium;
-  }
-
-  p {
-    @apply leading-relaxed;
-    /* Add word-break fallback for browsers that don't support text-wrap */
-    word-break: break-word;
-    overflow-wrap: break-word;
-    /* Add text-wrap for modern browsers */
-    text-wrap: pretty;
-  }
-
-  a {
-    @apply text-primary hover:text-primary-dark transition-colors;
-  }
+/* Base Styles */
+.base-body {
+  @apply bg-gray-50 text-gray-900 antialiased;
 }
 
-@layer components {
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors;
-  }
-
-  .btn-primary {
-    @apply btn bg-primary text-white hover:bg-primary-dark focus:ring-primary;
-  }
-
-  .btn-secondary {
-    @apply btn bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary;
-  }
-
-  .btn-outline {
-    @apply btn border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-primary;
-  }
-
-  .btn-danger {
-    @apply btn bg-error text-white hover:bg-red-700 focus:ring-red-500;
-  }
-
-  .input {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm;
-  }
-
-  .select {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm;
-  }
-
-  .card {
-    @apply bg-white shadow rounded-lg overflow-hidden;
-  }
-
-  .card-header {
-    @apply px-4 py-5 border-b border-gray-200 sm:px-6;
-  }
-
-  .card-body {
-    @apply px-4 py-5 sm:p-6;
-  }
-
-  .card-footer {
-    @apply px-4 py-4 border-t border-gray-200 sm:px-6;
-  }
-
-  .alert {
-    @apply rounded-md p-4;
-  }
-
-  .alert-success {
-    @apply alert bg-green-50 border-l-4 border-green-400;
-  }
-
-  .alert-warning {
-    @apply alert bg-yellow-50 border-l-4 border-yellow-400;
-  }
-
-  .alert-error {
-    @apply alert bg-red-50 border-l-4 border-red-400;
-  }
-
-  .alert-info {
-    @apply alert bg-blue-50 border-l-4 border-blue-400;
-  }
-
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .badge-success {
-    @apply badge bg-green-100 text-green-800;
-  }
-
-  .badge-warning {
-    @apply badge bg-yellow-100 text-yellow-800;
-  }
-
-  .badge-error {
-    @apply badge bg-red-100 text-red-800;
-  }
-
-  .badge-info {
-    @apply badge bg-blue-100 text-blue-800;
-  }
-
-  .loading {
-    @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary;
-  }
+.base-h1 {
+  @apply text-4xl font-bold tracking-tight;
 }
 
-@layer utilities {
-  /* Replace scrollbar-hide with a cross-browser solution */
-  .scrollbar-hide {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
+.base-h2 {
+  @apply text-3xl font-semibold tracking-tight;
+}
 
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
-  }
+.base-h3 {
+  @apply text-2xl font-semibold;
+}
 
-  .text-shadow {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+.base-h4 {
+  @apply text-xl font-medium;
+}
 
-  .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
+.base-p {
+  @apply leading-relaxed;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+}
 
-  /* Add overflow-wrap utility for better text wrapping */
-  .break-words {
-    word-break: break-word;
-    overflow-wrap: break-word;
+.base-a {
+  @apply text-primary hover:text-primary-dark transition-colors;
+}
+
+/* Component Styles */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors;
+}
+
+.btn-primary {
+  @apply btn bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+}
+
+.btn-secondary {
+  @apply btn bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary;
+}
+
+.btn-outline {
+  @apply btn border-gray-300 text-gray-700 bg-white hover:bg-gray-50 focus:ring-primary;
+}
+
+.btn-danger {
+  @apply btn bg-error text-white hover:bg-red-700 focus:ring-red-500;
+}
+
+.input {
+  @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm;
+}
+
+.select {
+  @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm;
+}
+
+.card {
+  @apply bg-white shadow rounded-lg overflow-hidden;
+}
+
+.card-header {
+  @apply px-4 py-5 border-b border-gray-200 sm:px-6;
+}
+
+.card-body {
+  @apply px-4 py-5 sm:p-6;
+}
+
+.card-footer {
+  @apply px-4 py-4 border-t border-gray-200 sm:px-6;
+}
+
+.alert {
+  @apply rounded-md p-4;
+}
+
+.alert-success {
+  @apply alert bg-green-50 border-l-4 border-green-400;
+}
+
+.alert-warning {
+  @apply alert bg-yellow-50 border-l-4 border-yellow-400;
+}
+
+.alert-error {
+  @apply alert bg-red-50 border-l-4 border-red-400;
+}
+
+.alert-info {
+  @apply alert bg-blue-50 border-l-4 border-blue-400;
+}
+
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-success {
+  @apply badge bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply badge bg-yellow-100 text-yellow-800;
+}
+
+.badge-error {
+  @apply badge bg-red-100 text-red-800;
+}
+
+.badge-info {
+  @apply badge bg-blue-100 text-blue-800;
+}
+
+.loading {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary;
+}
+
+/* Utility Styles */
+.scrollbar-hide {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
   }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+  
+  /* Fallback for browsers that don't support custom scrollbars */
+  overflow: -moz-scrollbars-none;  /* Old Firefox */
+  scrollbar-color: transparent transparent;
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-lg {
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.break-words {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+}
+
+/* Apply base styles to elements */
+body {
+  composes: base-body;
+}
+
+h1 {
+  composes: base-h1;
+}
+
+h2 {
+  composes: base-h2;
+}
+
+h3 {
+  composes: base-h3;
+}
+
+h4 {
+  composes: base-h4;
+}
+
+p {
+  composes: base-p;
+}
+
+a {
+  composes: base-a;
 }

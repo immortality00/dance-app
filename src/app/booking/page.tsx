@@ -1,58 +1,95 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { db } from '@/config/firebase';
 import { 
   collection, 
   query, 
   where, 
-  onSnapshot,
+  getDocs,
   runTransaction,
   doc,
   orderBy,
-  Timestamp
+  Timestamp,
+  limit,
+  startAfter,
+  QueryDocumentSnapshot
 } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/Toast';
 import { Loading } from '@/components/Loading';
 import { DanceStyle, type FirestoreClassData } from '@/types/firebase';
 
+const CLASSES_PER_PAGE = 9;
+
 export default function BookingPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [classes, setClasses] = useState<FirestoreClassData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [selectedStyle, setSelectedStyle] = useState<DanceStyle | 'ALL'>('ALL');
   const [selectedLevel, setSelectedLevel] = useState<FirestoreClassData['level'] | 'ALL'>('ALL');
   const [processing, setProcessing] = useState<string | null>(null);
+  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot | null>(null);
+
+  const fetchClasses = useCallback(async (isLoadingMore = false) => {
+    try {
+      let baseQuery = query(
+        collection(db, 'classes'),
+        orderBy('lastUpdated', 'desc')
+      );
+
+      // Apply filters if selected
+      if (selectedStyle !== 'ALL') {
+        baseQuery = query(baseQuery, where('style', '==', selectedStyle));
+      }
+      if (selectedLevel !== 'ALL') {
+        baseQuery = query(baseQuery, where('level', '==', selectedLevel));
+      }
+
+      // Apply pagination
+      let paginatedQuery = query(baseQuery, limit(CLASSES_PER_PAGE));
+      if (isLoadingMore && lastVisible) {
+        paginatedQuery = query(baseQuery, startAfter(lastVisible), limit(CLASSES_PER_PAGE));
+      }
+
+      const snapshot = await getDocs(paginatedQuery);
+      const newClasses = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as FirestoreClassData[];
+
+      // Update last visible document for pagination
+      setLastVisible(snapshot.docs[snapshot.docs.length - 1] || null);
+      setHasMore(snapshot.docs.length === CLASSES_PER_PAGE);
+
+      if (isLoadingMore) {
+        setClasses(prev => [...prev, ...newClasses]);
+      } else {
+        setClasses(newClasses);
+      }
+    } catch (error) {
+      console.error('Error fetching classes:', error);
+      showToast('Failed to fetch classes', 'error');
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [selectedStyle, selectedLevel, lastVisible, showToast]);
 
   useEffect(() => {
-    // Create a query for real-time updates
-    const classesQuery = query(
-      collection(db, 'classes'),
-      orderBy('lastUpdated', 'desc')
-    );
+    setLoading(true);
+    setLastVisible(null);
+    fetchClasses();
+  }, [fetchClasses, selectedStyle, selectedLevel]);
 
-    // Set up real-time listener
-    const unsubscribe = onSnapshot(classesQuery, 
-      (snapshot) => {
-        const classesData = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as FirestoreClassData[];
-        setClasses(classesData);
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Error fetching classes:', error);
-        showToast('Failed to fetch classes', 'error');
-        setLoading(false);
-      }
-    );
-
-    // Cleanup subscription
-    return () => unsubscribe();
-  }, [showToast]);
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    await fetchClasses(true);
+  };
 
   const handleBooking = async (classId: string) => {
     if (!user) {
@@ -73,23 +110,33 @@ export default function BookingPage() {
 
         const classData = classDoc.data() as FirestoreClassData;
 
-        // Check if already enrolled
         if (classData.enrolledStudents?.includes(user.id)) {
           throw new Error('You are already enrolled in this class');
         }
 
-        // Check capacity
         if (classData.enrolled >= classData.capacity) {
           throw new Error('Class is full');
         }
 
-        // Update the class document
         transaction.update(classRef, {
           enrolled: classData.enrolled + 1,
           enrolledStudents: [...(classData.enrolledStudents || []), user.id],
           lastUpdated: Timestamp.now(),
         });
       });
+
+      // Update the local state to reflect the change
+      setClasses(prevClasses => 
+        prevClasses.map(cls => 
+          cls.id === classId
+            ? {
+                ...cls,
+                enrolled: cls.enrolled + 1,
+                enrolledStudents: [...(cls.enrolledStudents || []), user.id],
+              }
+            : cls
+        )
+      );
 
       showToast('Successfully booked the class!', 'success');
     } catch (error: any) {
@@ -98,12 +145,6 @@ export default function BookingPage() {
       setProcessing(null);
     }
   };
-
-  const filteredClasses = classes.filter(cls => {
-    if (selectedStyle !== 'ALL' && cls.style !== selectedStyle) return false;
-    if (selectedLevel !== 'ALL' && cls.level !== selectedLevel) return false;
-    return true;
-  });
 
   if (loading) {
     return (
@@ -154,7 +195,7 @@ export default function BookingPage() {
 
         {/* Class Grid */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredClasses.map((danceClass) => {
+          {classes.map((danceClass) => {
             const isEnrolled = danceClass.enrolledStudents?.includes(user?.id || '');
             const isFull = danceClass.enrolled >= danceClass.capacity;
             const isProcessing = processing === danceClass.id;
@@ -198,9 +239,29 @@ export default function BookingPage() {
           })}
         </div>
 
-        {filteredClasses.length === 0 && (
+        {classes.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">No classes found matching your filters.</p>
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {hasMore && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {loadingMore ? (
+                <>
+                  <Loading size="sm" className="mr-2" />
+                  Loading...
+                </>
+              ) : (
+                'Load More Classes'
+              )}
+            </button>
           </div>
         )}
       </div>
