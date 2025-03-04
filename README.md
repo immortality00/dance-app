@@ -2,6 +2,9 @@
 
 A modern web application for managing dance classes, students, instructors, and studio rentals built with Next.js, Firebase, and TypeScript.
 
+**Important Note:**
+Trying to create the app with AI is too slow because the AI is not smart enough to process the instructions, discover bugs or fix them yet... and it takes multiple attempts to finally find the solution... and it keeps fixing parts of the errors and ignores the rest.
+
 ## 🚀 Tech Stack
 
 - **Framework:** [Next.js 15](https://nextjs.org/)
