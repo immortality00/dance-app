@@ -1,0 +1,22 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Check for sensitive files (excluding pre-commit hook)
+if git diff --cached --name-only | grep -v "^.husky/pre-commit$" | grep -E '\.env$|\.env\.|\.pem$|\.key$|secret|password|credential'; then
+  echo "❌ Attempt to commit sensitive files detected!"
+  echo "Please remove these files from your commit and add them to .gitignore"
+  exit 1
+fi
+
+# Check for large files (>5MB)
+if git diff --cached --name-only | xargs -I {} sh -c 'if [ -f "{}" ] && [ $(stat -f%z "{}") -gt 5242880 ]; then echo "{}"; fi' | grep .; then
+  echo "❌ Attempt to commit large files detected!"
+  echo "Please remove these files from your commit or use Git LFS"
+  exit 1
+fi
+
+# Run security checks
+npm run security-check
+
+# Run linting
+npm run lint 

@@ -12,7 +12,8 @@
     "seed:classes": "tsx scripts/seed-classes.ts",
     "seed:financial": "tsx scripts/seed-financial-data.ts",
     "check-env": "tsx scripts/check-env.ts",
-    "validate-env": "tsx scripts/validate-env.ts"
+    "validate-env": "tsx scripts/validate-env.ts",
+    "security-check": "tsx scripts/security-check.ts"
   },
   "dependencies": {
     "@auth/firebase-adapter": "^2.7.4",
