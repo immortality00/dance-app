@@ -79,6 +79,19 @@ Trying to create the app with AI is too slow because the AI is not smart enough 
 - Automated reminders
 - Studio booking confirmations
 
+### Security Features
+- Strong password requirements
+- Account lockout after multiple failed attempts
+- CSRF protection for all API routes
+- Content Security Policy implementation
+- Secure HTTP headers
+- Rate limiting for authentication and API endpoints
+- Input validation and sanitization
+- Secure environment variable handling
+- Pre-commit hooks to prevent committing sensitive information
+- Regular security scanning
+- Dependency vulnerability monitoring
+
 ## 🚀 Getting Started
 
 1. Clone the repository:
@@ -218,6 +231,39 @@ Required environment variables include:
    - Suggests optimal booking times
    - Uses OpenAI GPT-3.5
 
+### Security Implementation
+
+1. **Authentication Security:**
+   - Strong password validation
+   - Account lockout after 10 failed attempts
+   - Secure token storage in HttpOnly cookies
+   - Automatic token refresh
+   - Session invalidation on sign-out
+
+2. **API Security:**
+   - CSRF protection for all non-GET requests
+   - Rate limiting to prevent abuse
+   - Input validation with Zod schemas
+   - Proper error handling without leaking sensitive information
+
+3. **Data Security:**
+   - Firestore security rules with proper validation
+   - Field-level access control
+   - Data validation before storage
+   - Secure environment variable handling
+
+4. **Infrastructure Security:**
+   - Content Security Policy (CSP) implementation
+   - Secure HTTP headers
+   - CORS configuration
+   - HTTPS enforcement
+
+5. **Development Security:**
+   - Pre-commit hooks to prevent committing sensitive files
+   - Regular security scanning
+   - Dependency vulnerability monitoring
+   - Security documentation
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -225,6 +271,10 @@ Required environment variables include:
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## 🔒 Security
+
+Please see our [Security Policy](SECURITY.md) for information about our security practices and how to report security vulnerabilities.
 
 ## 📞 Support
 
