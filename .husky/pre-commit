@@ -2,10 +2,26 @@
 . "$(dirname "$0")/_/husky.sh"
 
 # Check for sensitive files (excluding pre-commit hook)
-if git diff --cached --name-only | grep -v "^.husky/pre-commit$" | grep -E '\.env$|\.env\.|\.pem$|\.key$|secret|password|credential'; then
+if git diff --cached --name-only | grep -v "^.husky/pre-commit$" | grep -E '\.env$|\.env\.|\.pem$|\.key$'; then
   echo "❌ Attempt to commit sensitive files detected!"
   echo "Please remove these files from your commit and add them to .gitignore"
   exit 1
+fi
+
+# Check for hardcoded secrets (more intelligently)
+# 1. Find files with sensitive keywords
+# 2. Filter out safe patterns (environment variables, config references)
+# 3. Look for suspicious patterns that resemble actual secrets
+suspicious_files=$(git diff --cached --name-only | xargs grep -l "secret\|password\|credential\|token\|api[_-]key")
+if [ -n "$suspicious_files" ]; then
+  # Check if any of these files contain actual hardcoded secrets (not just references)
+  hardcoded_secrets=$(echo "$suspicious_files" | xargs grep -v "config\.\|process\.env\.\|env\." | grep -E "['\"](sk_[a-zA-Z0-9]{20,}|[a-zA-Z0-9_\-]{32,})['\"]")
+  if [ -n "$hardcoded_secrets" ]; then
+    echo "❌ Potential hardcoded secrets detected!"
+    echo "$hardcoded_secrets"
+    echo "Please remove hardcoded secrets and use environment variables instead"
+    exit 1
+  fi
 fi
 
 # Check for large files (>5MB)
